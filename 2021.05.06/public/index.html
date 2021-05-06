@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js"></script>
+</head>
+<body>
+    <h1>Угадай число от 1 до 10</h1>
+    <form action="/guess-number" method="post">
+        <input type="number" min="1" max="10" step="1" name="answer">
+        <button type="submit">Угадать</button>
+    </form>
+    <script>
+        let form = document.forms[0];
+        form.addEventListener("submit", e => {
+            e.preventDefault(); // Остановить действие по умолчанию
+            let body = {};
+            for (let i = 0; i < e.target.elements.length; i++) {
+                let el = e.target.elements[i];
+                if (el.name) {
+                    body[el.name] = el.value;
+                }
+            }
+            console.log(body);
+            /*
+                JSON.parse(str) => преобразовывает строку в объект (если возможно)
+                JSON.stringify(obj) => преобразовыветс объект в строку
+            */
+
+            fetch(e.target.action, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(body)
+            })
+            .then(res => res.text())
+            .then(data => openPopup(data));
+        });
+    </script>
+</body>
+</html>
