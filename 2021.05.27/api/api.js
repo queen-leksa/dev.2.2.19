@@ -1,15 +1,27 @@
 const router = require("express").Router();
 const Furn = require("./models/furniture");
+const parser = require("body-parser").json();
 
 router.get("/", async (req, res) => {
     const data = await Furn.find({});
     res.json(data);
 });
 
-router.post("/", async (req, res) => {
+/*
+* function foo() {
+*   console.log(req.body);
+* }
+* router.post("path", foo(), (req,res) => {...})
+* */
+
+router.post("/", parser, async (req, res) => {
     console.log(req.body);
     await Furn(req.body).save();
     res.json({"msg": "ok"});
+});
+router.get("/", async (req, res) => {
+    let furn = await Furn.find({});
+    res.json(furn);
 });
 
 // const connect = require("./db");

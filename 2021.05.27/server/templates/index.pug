@@ -16,7 +16,7 @@ html
                 a(href="") Link 5
         main
             h1 Furniture
-            form(method="post")
+            form(method="post" id="addFurn")
                 input(type="text" name="name" placeholder="Тип мебели")
                 input(type="color" name="color" placeholder="Цвет" value="#defabb")
                 input(type="number" name="rating" placeholder="Рейтинг" min="0" max="5" step="0.5" value="0")
@@ -33,10 +33,10 @@ html
                 a(href="")
                     i.fab.fa-vk
         script.
-            const send = async(body) => {
+            const send = async(body, el) => {
                 let res = await fetch("/api", {
                     method: "post",
-                    header: {
+                    headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     },
@@ -44,7 +44,36 @@ html
                 });
                 let data = await res.json();
                 console.log(data);
+                take(el);
+            }
+            const take = async (el) => {
+                let res = await fetch("/api"); // method => GET
+                let data = await res.json();
+                console.log(data);
+                el.innerHTML = "";
+                data.forEach(item => {
+                    let html = `<div style="color: ${item.color}">${item.name} rating: ${item.rating}</div>`;
+                    el.innerHTML += html;
+                });
             }
 
-            send({name: "Кровать", color: "#00ff00", rating: "4"});
+            const addForm = document.forms.addFurn;
+            const resultBlock = addForm.nextElementSibling;
+            take(resultBlock);
+
+            addForm.addEventListener("submit", e => {
+                e.preventDefault();
+                let body = {};
+                // e.target - тот, кто вызвал событие => addForm
+                for (let i = 0; i < e.target.elements.length; i++) {
+                    let el = e.target.elements[i];
+                    if (el.name) {
+                        body[el.name] = el.value;
+                    }
+                }
+                console.log(body);
+                send(body, resultBlock);
+            });
+
+
         

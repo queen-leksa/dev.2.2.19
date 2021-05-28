@@ -3,6 +3,7 @@ const parser = require("body-parser").json();
 const app = express();
 
 app.use(express.urlencoded(true)); // Чтобы получать req.body (методом post)
+app.use(express.json());
 app.use(parser);
 app.use(express.static("./public"));
 app.use("/", require("./server/router"));
