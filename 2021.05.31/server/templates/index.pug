@@ -1,0 +1,138 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        title Task Manager
+        link(rel="stylesheet" href="/style.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous")
+    body
+        header
+            i.fas.fa-tasks.fa-3x
+            nav.menu
+                a(href="") Link 1
+                a(href="") Link 2
+                a(href="") Link 3
+                a(href="") Link 4
+                a(href="") Link 5
+        main
+            h1 Furniture
+            form(method="post" id="addFurn")
+                input(type="text" name="name" placeholder="Тип мебели")
+                input(type="color" name="color" placeholder="Цвет" value="#defabb")
+                input(type="number" name="rating" placeholder="Рейтинг" min="0" max="5" step="0.5" value="0")
+                button(type="submit") Добавить
+            .result
+        footer
+            nav.soc
+                a(href="")
+                    i.fab.fa-tiktok
+                a(href="")
+                    i.fab.fa-twitter
+                a(href="")
+                    i.fab.fa-telegram
+                a(href="")
+                    i.fab.fa-vk
+        script.
+            const send = async(body, el) => {
+                let res = await fetch("/api", {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                });
+                let data = await res.json();
+                console.log(data);
+                take(el);
+            }
+            const take = async (el) => {
+                let res = await fetch("/api"); // method => GET
+                let data = await res.json();
+                console.log(data);
+                el.innerHTML = "";
+                data.forEach(item => {
+                    let html = `<div data-info="${item._id}" style="color: ${item.color}">${item.name} rating: ${item.rating} <button class="change-btn">change</button><button class="del-btn">x</button></div>`;
+                    el.innerHTML += html;
+                });
+                let btns = el.querySelectorAll(".del-btn");
+                btns.forEach(btn => {
+                    btn.addEventListener("click", e => {
+                        let parent = btn.parentElement;
+                        console.log("delete", btn.parentElement.getAttribute("data-info"));
+                        remove(parent.getAttribute("data-info"), parent);
+                    });
+                });
+                let changeBtns = el.querySelectorAll(".change-btn");
+                changeBtns.forEach(btn => {
+                    btn.addEventListener("click", e => {
+                        let parent = btn.parentElement;
+                        let content = parent.innerText.split(" ");
+                        console.log(content);
+                        let clone = parent.cloneNode(true);
+                        let btn1 = parent.firstElementChild.cloneNode(true);
+                        let btn2 = parent.lastElementChild.cloneNode(true);
+                        let inpName = document.createElement("input");
+                        inpName.name = "name";
+                        inpName.value = content[0];
+                        let inpColor = document.createElement("input");
+                        inpColor.type = "color";
+                        inpColor.name = "color";
+                        inpColor.value = parent.style.color;
+                        let inpRating = document.createElement("input");
+                        inpRating.type = "number";
+                        inpRating.name = "rating";
+                        inpRating.value = content[2];
+                        let ok = document.createElement("button");
+                        ok.innerText = "ok";
+                        let neok = document.createElement("button");
+                        neok.innerText = "cancel";
+                        neok.addEventListener("click", e => {
+                            console.log(clone);
+                            parent.parentElement.insertBefore(clone, parent);
+                            parent.remove();
+                        })
+                        parent.innerText = "";
+                        parent.append(inpName, inpColor, inpRating, ok, neok);
+
+                    });
+                })
+            }
+            const remove = async (id, el) => {
+                let res = await fetch("/api/delete/" + id, {
+                    method: "DELETE",
+                    headers: {
+                        "Accept": "Application/json"
+                    }
+                });
+                // let data = await res.json();
+                // if (data.msg === "ok") {
+                //     el.remove();
+                // }
+                res.json().then(d => {
+                    if (d.msg === "ok") {
+                        el.remove();
+                    }
+                });
+            };
+
+            const addForm = document.forms.addFurn;
+            const resultBlock = addForm.nextElementSibling;
+            take(resultBlock);
+
+            addForm.addEventListener("submit", e => {
+                e.preventDefault();
+                let body = {};
+                // e.target - тот, кто вызвал событие => addForm
+                for (let i = 0; i < e.target.elements.length; i++) {
+                    let el = e.target.elements[i];
+                    if (el.name) {
+                        body[el.name] = el.value;
+                    }
+                }
+                console.log(body);
+                send(body, resultBlock);
+            });
+
+
+        
