@@ -1,0 +1,147 @@
+doctype html
+html
+    head
+        meta(charset="utf-8")
+        title Task Manager
+        link(rel="stylesheet" href="/style.css")
+        link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous")
+    body
+        header
+            i.fas.fa-tasks.fa-3x
+            nav.menu
+                a(href="/file.html") File
+                a(href="") Link 2
+                a(href="") Link 3
+                a(href="") Link 4
+                a(href="") Link 5
+        main
+            h1 Furniture
+            form(method="post" id="addFurn")
+                input(type="text" name="name" placeholder="Тип мебели")
+                input(type="color" name="color" placeholder="Цвет" value="#defabb")
+                input(type="number" name="rating" placeholder="Рейтинг" min="0" max="5" step="0.5" value="0")
+                button(type="submit") Добавить
+            .result
+        footer
+            nav.soc
+                a(href="")
+                    i.fab.fa-tiktok
+                a(href="")
+                    i.fab.fa-twitter
+                a(href="")
+                    i.fab.fa-telegram
+                a(href="")
+                    i.fab.fa-vk
+        script.
+            const send = async(body, el) => {
+                let res = await fetch("/api", {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(body)
+                });
+                let data = await res.json();
+                console.log(data);
+                take(el);
+            }
+            const take = async (el) => {
+                let res = await fetch("/api"); // method => GET
+                let data = await res.json();
+                console.log(data);
+                el.innerHTML = "";
+                data.forEach(item => {
+                    let html = `<div class="row" data-info="${item._id}" style="color: ${item.color}">
+                        <div class="info active">
+                            <span>${item.name}</span> 
+                            rating: 
+                            <span>${item.rating}</span>
+                            <button class="change-btn">change</button>
+                            <button class="del-btn">x</button>
+                        </div>
+                        <div class="form">
+                            <input type="text" value="${item.name}" name="name">
+                            <input type="color" value="${item.color}" name="color">
+                            <input type="number" value="${item.rating}" name="rating">
+                            <button class="ok">ok</button>
+                            <button class="neok">cancel</button>
+                        </div>
+                    </div>`;
+                    el.innerHTML += html;
+                });
+                let btns = el.querySelectorAll(".del-btn");
+                btns.forEach(btn => {
+                    btn.addEventListener("click", e => {
+                        let parent = btn.parentElement.parentElement;
+                        remove(parent.getAttribute("data-info"), parent);
+                    });
+                });
+                let changeBtns = el.querySelectorAll(".change-btn");
+                changeBtns.forEach(btn => {
+                    let parent = btn.parentElement;
+                    let bro = parent.nextElementSibling;
+                    let okBtn = bro.querySelector(".ok");
+                    let neokBtn = bro.querySelector(".neok");
+                    btn.addEventListener("click", e => {
+                        parent.classList.remove("active");
+                        bro.classList.add("active");
+                    });
+                    neokBtn.addEventListener("click", e => {
+                        bro.classList.remove("active");
+                        parent.classList.add("active");
+                    });
+                    okBtn.addEventListener("click", e => {
+                        let body = {
+                            "name": bro.querySelector("[name=\"name\"]").value,
+                            "color": bro.querySelector("[name=\"color\"]").value,
+                            "rating": bro.querySelector("[name=\"rating\"]").value,
+                        };
+                        bro.classList.remove("active");
+                        parent.style.color = body.color;
+                        parent.firstElementChild.innerText = body.name;
+                        parent.firstElementChild.nextElementSibling.innerText = body.rating;
+                        parent.classList.add("active");
+                    });
+                    // send body to database
+                        
+                })
+            }
+            const remove = async (id, el) => {
+                let res = await fetch("/api/delete/" + id, {
+                    method: "DELETE",
+                    headers: {
+                        "Accept": "Application/json"
+                    }
+                });
+                // let data = await res.json();
+                // if (data.msg === "ok") {
+                //     el.remove();
+                // }
+                res.json().then(d => {
+                    if (d.msg === "ok") {
+                        el.remove();
+                    }
+                });
+            };
+
+            const addForm = document.forms.addFurn;
+            const resultBlock = addForm.nextElementSibling;
+            take(resultBlock);
+
+            addForm.addEventListener("submit", e => {
+                e.preventDefault();
+                let body = {};
+                // e.target - тот, кто вызвал событие => addForm
+                for (let i = 0; i < e.target.elements.length; i++) {
+                    let el = e.target.elements[i];
+                    if (el.name) {
+                        body[el.name] = el.value;
+                    }
+                }
+                console.log(body);
+                send(body, resultBlock);
+            });
+
+
+        

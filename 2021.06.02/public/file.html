@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File</title>
+    <style>
+        .info {
+            display: none;
+        }
+        .form {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="row" style="color: #008">
+        <div class="info active">
+            <span>Кровать</span> 
+            rating: 
+            <span>4</span>
+            <button class="chg">change</button>
+            <button class="del">x</button>
+        </div>
+        <div class="form">
+            <input type="text" value="Кровать" name="name">
+            <input type="color" value="#000088" name="color">
+            <input type="number" value="4" name="rating">
+            <button class="ok">ok</button>
+            <button class="neok">cancel</button>
+        </div>
+    </div>
+    <script>
+        let infoBlock = document.querySelector(".info");
+        let formBlock = document.querySelector(".form");
+        let chgBtn = infoBlock.querySelector(".chg");
+        let okBtn = formBlock.querySelector(".ok");
+        let neokBtn = formBlock.querySelector(".neok");
+        chgBtn.addEventListener("click", e => {
+            infoBlock.classList.remove("active");
+            formBlock.classList.add("active");
+        });
+        neokBtn.addEventListener("click", e => {
+            formBlock.classList.remove("active");
+            infoBlock.classList.add("active");
+        });
+        okBtn.addEventListener("click", e => {
+            let body = {
+                "name": formBlock.querySelector("[name=\"name\"]").value,
+                "color": formBlock.querySelector("[name=\"color\"]").value,
+                "rating": formBlock.querySelector("[name=\"rating\"]").value,
+            };
+            console.log(body);
+            formBlock.classList.remove("active");
+            infoBlock.style.color = body.color;
+            infoBlock.firstElementChild.innerText = body.name;
+            infoBlock.firstElementChild.nextElementSibling.innerText = body.rating;
+            infoBlock.classList.add("active");
+        });
+
+    </script>
+</body>
+</html>

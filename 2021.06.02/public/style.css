@@ -1,0 +1,56 @@
+html {
+    font-size: 20px;
+}
+body {
+    background: #222;
+    color: #efefef;
+    font-family: sans-serif;
+    width: 1000px;
+    margin: auto;
+}
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.menu, .soc {
+    display: flex;
+    gap: 1rem;
+}
+a {
+    color: inherit;
+}
+footer {
+    display: flex;
+    justify-content: center;
+}
+input, button {
+    font-size: 1rem;
+}
+.popup {
+    border: 1px solid;
+    padding: 1rem;
+    background-color: slategray;
+    border-radius: .5rem;
+    position: fixed;
+    width: 300px;
+    left: calc(50vw - 150px);
+    top: 30vh;
+}
+.popup>.close {
+    position: absolute;
+    line-height: 1;
+    top: .5rem;
+    right: .5rem;
+    cursor: pointer;
+}
+
+.info {
+    display: none;
+}
+.form {
+    display: none;
+}
+.active {
+    display: block;
+}
